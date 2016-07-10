@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper的配置信息 -->
+<mapper namespace="com.freeway.web.mappers.business.SuspectedCardReplacementMapper">
+    <!-- query condition -->
+    <sql id="where_clause">
+        WHERE  exitDate >= #{beginDate} AND #{endDate} >= exitDate
+               <if test="hiddenBlank == true">
+                   AND carExitcodeRecognize IS NOT NULL
+               </if>
+               <if test="hiddenZero == true">
+                   AND carExitcodeRecognize > '000000'
+               </if>
+               <if test="convertflag != null and convertflag != ''">
+                   AND convertflag = #{convertflag}
+               </if>
+               <if test="carCode != null and carCode != ''">
+                   AND REGEXP_LIKE(RTRIM(carExitcodeRecognize), #{carCode})
+               </if>
+    </sql>
+    
+	<!-- 疑似换卡车辆分页数据查询 -->
+	<select id="findByCondition" resultType="SuspectedCardReplacement"
+		parameterType="ConditionFiled">
+			SELECT * FROM (
+			    SELECT a.*, row_number() OVER (ORDER BY a.exitDate DESC) rn 
+			    FROM   change_card_view a
+                <include refid="where_clause"></include>
+			)
+            WHERE rn > #{start} and #{limit} >= rn
+	</select>
+	
+	<!-- 疑似换卡车辆总数据量查询 -->
+	<select id="selectCount" resultType="Integer" parameterType="ConditionFiled">
+	    SELECT COUNT(recordNo)
+	    FROM   change_card_view
+        <include refid="where_clause"></include>
+	</select>
+</mapper>

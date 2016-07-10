@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper的配置信息 -->
+<mapper namespace="com.freeway.web.mappers.business.CardTypeDoesNotMatchMapper">
+    <!-- query condition -->
+    <sql id="where_clause">
+        WHERE  enteDate >= #{beginDate} AND #{endDate} >= enteDate
+               <if test="carCode != null and carCode != ''">
+                   AND REGEXP_LIKE(RTRIM(carExitcodeRecognize), #{carCode})
+               </if>
+               <if test="hiddenBlank == true">
+                   AND carExitcodeRecognize IS NOT NULL
+               </if>
+               <if test="hiddenZero == true">
+                   AND carExitcodeRecognize > '000000'
+               </if>
+               <if test="cartype != null and cartype != ''">
+                   AND convertflag = #{cartype}
+               </if>
+    </sql>
+    
+	<!-- 牌型不符分页数据查询 -->
+	<select id="findByCondition" resultType="CardTypeDoesNotMatch"
+		parameterType="ConditionFiled">
+			SELECT * FROM (
+			    SELECT a.*, row_number() OVER (ORDER BY a.exitDate DESC) rn 
+			    FROM   car_type_view a
+                <include refid="where_clause"></include>
+			)
+            WHERE rn > #{start} and #{limit} >= rn
+	</select>
+	
+	<!-- 牌型不符总数据量查询 -->
+	<select id="selectCount" resultType="Integer" parameterType="ConditionFiled">
+	    SELECT COUNT(recordNo)
+	    FROM   car_type_view
+        <include refid="where_clause"></include>
+	</select>
+</mapper>

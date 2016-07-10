@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- Mapper的配置信息 -->
+<mapper namespace="com.freeway.web.mappers.business.CarTrafficRecordMapper">
+    <!-- query condition -->
+    <sql id="where_clause">
+        WHERE
+        <choose>
+            <when test="icCode.matches('[0-9]{7}')">icCode = #{icCode}</when>
+            <otherwise>carRecognize = #{icCode}</otherwise> 
+        </choose>
+    </sql>
+    
+	<!-- 车流量分页数据查询 -->
+	<select id="findByCondition" resultType="CarTrafficRecord"
+		parameterType="ConditionFiled">
+            SELECT * FROM (
+                SELECT a.*, row_number() OVER (ORDER BY a.tolldate) rn 
+                FROM   tracking_view a
+                <include refid="where_clause"></include>
+            )
+            WHERE rn > #{start} and #{limit} >= rn
+	</select>
+	
+	<!-- 车流量总数据量查询 -->
+	<select id="selectCount" resultType="Integer" parameterType="ConditionFiled">
+	    SELECT COUNT(recordNo)
+	    FROM   tracking_view
+        <include refid="where_clause"></include>
+	</select>
+</mapper>
