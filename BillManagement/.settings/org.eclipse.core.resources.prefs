@@ -1,0 +1,8 @@
+eclipse.preferences.version=1
+encoding//src/main/java=UTF-8
+encoding//src/main/java/com/freeway/web/controllers/system/SystemLoginController.java=UTF-8
+encoding//src/main/java/com/freeway/web/serviceimpl/business/CardService.java=UTF-8
+encoding//src/main/java/com/freeway/web/serviceimpl/business/CardTypeDoesNotMatchService.java=UTF-8
+encoding//src/main/java/com/freeway/web/serviceimpl/business/SometimesWhenFreeAndNotFreeService.java=UTF-8
+encoding//src/test/java=UTF-8
+encoding/<project>=UTF-8
